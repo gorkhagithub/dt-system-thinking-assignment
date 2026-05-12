@@ -1,0 +1,1296 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --accent: #6c63ff;
+    --accent2: #00e5c3;
+    --accent3: #ff6b6b;
+    --amber: #ffc857;
+    --text: #f0f0ff;
+    --muted: rgba(240,240,255,0.45);
+    --mono: 'JetBrains Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Syne', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID NOISE BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo-block { display: flex; flex-direction: column; gap: 4px; }
+
+  .logo-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent2);
+    text-transform: uppercase;
+  }
+
+  .logo-title {
+    font-family: var(--serif);
+    font-size: 36px;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .status-pill {
+    background: rgba(0,229,195,0.1);
+    border: 1px solid rgba(0,229,195,0.25);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+  /* ── NAV TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    overflow-x: auto;
+  }
+
+  .tab {
+    flex: 1;
+    min-width: 110px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .tab:hover { background: var(--surface2); color: var(--text); }
+
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(108,99,255,0.35);
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── SECTION LABEL ── */
+  .sec-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FRAMEWORK SECTIONS ── */
+  .fw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .fw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s;
+  }
+
+  .fw-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .fw-card.purple::before { background: var(--accent); }
+  .fw-card.teal::before { background: var(--accent2); }
+  .fw-card.red::before { background: var(--accent3); }
+  .fw-card.amber::before { background: var(--amber); }
+
+  .fw-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+
+  .fw-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .fw-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .fw-card.purple .fw-title { color: var(--accent); }
+  .fw-card.teal .fw-title { color: var(--accent2); }
+  .fw-card.red .fw-title { color: var(--accent3); }
+  .fw-card.amber .fw-title { color: var(--amber); }
+
+  .fw-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .fw-list li {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 3px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.5;
+  }
+
+  .fw-list li::before { content: '→'; color: inherit; opacity: 0.5; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── ASSIGNMENT INPUT ── */
+  .input-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 20px;
+  }
+
+  .input-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 12px 14px;
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: rgba(240,240,255,0.2); }
+
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.4); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .btn-secondary:hover { background: var(--surface2); color: var(--text); }
+
+  /* ── OUTPUT AREA ── */
+  .output-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .output-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .output-body {
+    padding: 20px 22px;
+    min-height: 160px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--muted);
+    font-family: var(--mono);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .output-body.thinking {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(108,99,255,0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to{ transform: rotate(360deg); } }
+
+  /* ── FRAMEWORK DISPLAY ── */
+  .fw-output {
+    display: none;
+    padding: 0;
+  }
+
+  .fw-section {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fw-section:last-child { border-bottom: none; }
+
+  .fw-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .fw-section-label.purple { color: var(--accent); }
+  .fw-section-label.teal { color: var(--accent2); }
+  .fw-section-label.red { color: var(--accent3); }
+  .fw-section-label.amber { color: var(--amber); }
+  .fw-section-label.white { color: var(--text); }
+
+  .fw-section-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ── INSIGHTS ROW ── */
+  .insights-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+  }
+
+  .insight-card:hover { border-color: var(--border2); }
+
+  .insight-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .insight-label.purple { color: var(--accent); }
+  .insight-label.teal { color: var(--accent2); }
+  .insight-label.amber { color: var(--amber); }
+  .insight-label.red { color: var(--accent3); }
+  .insight-label.white { color: rgba(255,255,255,0.6); }
+
+  .insight-text {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.55;
+    font-style: italic;
+    font-family: var(--serif);
+  }
+
+  /* ── METRICS TABLE ── */
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .metrics-table th {
+    text-align: left;
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metrics-table td {
+    padding: 8px 10px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .metrics-table tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+  }
+
+  .badge-purple { background: rgba(108,99,255,0.15); color: var(--accent); }
+  .badge-teal { background: rgba(0,229,195,0.12); color: var(--accent2); }
+  .badge-red { background: rgba(255,107,107,0.15); color: var(--accent3); }
+  .badge-amber { background: rgba(255,200,87,0.15); color: var(--amber); }
+
+  /* ── SYSTEM MAP (Panel 2) ── */
+  .sys-map {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    align-items: center;
+    gap: 0;
+    margin: 16px 0;
+  }
+
+  .sys-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .sys-node-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .sys-node-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .sys-arrow { text-align: center; color: var(--accent); font-size: 18px; }
+
+  .loop-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .loop-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    position: relative;
+    text-align: center;
+  }
+
+  .loop-node::after {
+    content: '↓';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  .loop-node:last-child::after { display: none; }
+
+  .loop-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .loop-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .loop-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* ── AI DIVISION (Panel 3) ── */
+  .ai-table-wrap {
+    overflow-x: auto;
+    margin-top: 12px;
+  }
+
+  .ai-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 500px;
+  }
+
+  .ai-table th {
+    padding: 8px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: left;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .ai-table th:nth-child(1) { color: var(--text); }
+  .ai-table th:nth-child(2) { color: var(--accent); }
+  .ai-table th:nth-child(3) { color: var(--accent2); }
+  .ai-table th:nth-child(4) { color: var(--amber); }
+
+  .ai-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  .ai-table td:nth-child(1) { color: var(--text); font-weight: 600; }
+  .ai-table td:nth-child(2) { color: rgba(108,99,255,0.8); }
+  .ai-table td:nth-child(3) { color: rgba(0,229,195,0.8); }
+  .ai-table td:nth-child(4) { color: rgba(255,200,87,0.8); }
+
+  /* ── TRACKER (Panel 4) ── */
+  .tracker-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: rgba(240,240,255,0.2); }
+
+  .experiment-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .exp-number {
+    font-family: var(--mono);
+    font-size: 20px;
+    color: rgba(108,99,255,0.3);
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+
+  .exp-content { flex: 1; }
+  .exp-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .exp-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .exp-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) {
+    .row-2, .fw-grid, .tracker-form, .loop-container { grid-template-columns: 1fr; }
+    .sys-map { grid-template-columns: 1fr; }
+    .sys-arrow { transform: rotate(90deg); }
+    .insights-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo-block">
+      <span class="logo-tag">// DeepThought Fellowship</span>
+      <h1 class="logo-title">Systems OS</h1>
+      <p class="logo-sub">AI-Native Strategy &amp; Execution Engine for DT Fellows</p>
+    </div>
+    <div class="status-pill">
+      <div class="dot"></div>
+      LIVE · v1.0
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" onclick="switchTab('solver')" role="tab">⚙ Problem Solver</button>
+    <button class="tab" onclick="switchTab('systems')" role="tab">⟳ Systems Map</button>
+    <button class="tab" onclick="switchTab('aidivision')" role="tab">◈ AI Division</button>
+    <button class="tab" onclick="switchTab('tracker')" role="tab">◎ Experiment Tracker</button>
+    <button class="tab" onclick="switchTab('framework')" role="tab">≋ Framework</button>
+  </nav>
+
+  <!-- PANEL: SOLVER -->
+  <div id="panel-solver" class="panel active">
+    <p class="sec-label">// Assignment Solver</p>
+
+    <div class="input-block">
+      <div class="input-label">PASTE YOUR ASSIGNMENT / PROBLEM / PROMPT</div>
+      <textarea id="assignmentInput" placeholder="e.g. 'Design a growth strategy for a B2B SaaS startup with no marketing budget...' or 'Why do marketplaces fail at supply-demand balance at scale?'"></textarea>
+
+      <div class="input-label" style="margin-top:14px;">PROBLEM DOMAIN</div>
+      <select id="domainSelect">
+        <option value="startup_strategy">Startup Strategy &amp; GTM</option>
+        <option value="product">Product Architecture &amp; UX</option>
+        <option value="ai_systems">AI Systems Design</option>
+        <option value="systems_thinking">Systems Thinking &amp; Feedback Loops</option>
+        <option value="ops_execution">Ops &amp; Execution</option>
+        <option value="market_analysis">Market Analysis &amp; Competitive Intelligence</option>
+        <option value="org_design">Org Design &amp; Team Structure</option>
+      </select>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="solveAssignment()">⚡ Generate DT-Grade Answer ↗</button>
+        <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <div class="output-area" id="outputArea">
+      <div class="output-header">
+        <span class="output-title">// Structured Output</span>
+        <span id="outputStatus" style="font-family:var(--mono);font-size:10px;color:var(--muted);">READY</span>
+      </div>
+      <div class="output-body" id="outputBody">
+Paste your assignment above and hit Generate.
+
+The engine will break it using:
+→ First Principles Thinking
+→ Systems Analysis with feedback loops
+→ AI-Human division of labor
+→ Startup-grade execution plan
+→ Measurable metrics + next experiments</div>
+      <div class="fw-output" id="fwOutput"></div>
+    </div>
+
+    <div class="insights-row" id="insightRow" style="display:none;">
+      <div class="insight-card">
+        <div class="insight-label purple">Key Insight</div>
+        <div class="insight-text" id="ins1">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label teal">Structural Observation</div>
+        <div class="insight-text" id="ins2">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label amber">What Most People Miss</div>
+        <div class="insight-text" id="ins3">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label red">AI Leverage Opportunity</div>
+        <div class="insight-text" id="ins4">—</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label white">Next Experiment</div>
+        <div class="insight-text" id="ins5">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: SYSTEMS MAP -->
+  <div id="panel-systems" class="panel">
+    <p class="sec-label">// Systems Thinking Architecture</p>
+
+    <div class="card">
+      <div class="card-title">🔁 Core Feedback Loop Model</div>
+      <div class="card-body">Every business problem has a feedback loop. Map it before solving it. The structure below is a universal template — identify which node is your bottleneck.</div>
+    </div>
+
+    <div class="loop-container" style="position:relative;padding-bottom:24px;">
+      <div class="loop-node" style="border-top:2px solid var(--accent);">
+        <div class="loop-num">01</div>
+        <div class="loop-title">INPUT / TRIGGER</div>
+        <div class="loop-desc">What enters the system? User action, market signal, capital, demand.</div>
+      </div>
+      <div class="loop-node" style="border-top:2px solid var(--accent2);">
+        <div class="loop-num">02</div>
+        <div class="loop-title">PROCESSING ENGINE</div>
+        <div class="loop-desc">Core mechanism that transforms input → output. Product, ops, team.</div>
+      </div>
+      <div class="loop-node" style="border-top:2px solid var(--amber);">
+        <div class="loop-num">03</div>
+        <div class="loop-title">OUTPUT / SIGNAL</div>
+        <div class="loop-desc">Revenue, retention, NPS, churn, viral coefficient, activation rate.</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="sec-label">// Bottleneck Identification Framework</p>
+
+    <div class="fw-grid">
+      <div class="fw-card purple">
+        <div class="fw-num">TYPE A</div>
+        <div class="fw-title">Supply Constraint</div>
+        <ul class="fw-list">
+          <li>Can't deliver fast enough</li>
+          <li>Ops / fulfillment is the chokepoint</li>
+          <li>Hiring or capacity problem</li>
+          <li>Fix: automate or outsource core ops</li>
+        </ul>
+      </div>
+      <div class="fw-card teal">
+        <div class="fw-num">TYPE B</div>
+        <div class="fw-title">Demand Constraint</div>
+        <ul class="fw-list">
+          <li>Not enough qualified users entering</li>
+          <li>Distribution or awareness problem</li>
+          <li>ICP mismatch or messaging gap</li>
+          <li>Fix: sharpen positioning, find channel</li>
+        </ul>
+      </div>
+      <div class="fw-card amber">
+        <div class="fw-num">TYPE C</div>
+        <div class="fw-title">Conversion Constraint</div>
+        <ul class="fw-list">
+          <li>Traffic exists but doesn't convert</li>
+          <li>Value prop unclear or trust missing</li>
+          <li>Onboarding or activation failure</li>
+          <li>Fix: reduce time-to-value, reframe offer</li>
+        </ul>
+      </div>
+      <div class="fw-card red">
+        <div class="fw-num">TYPE D</div>
+        <div class="fw-title">Retention Constraint</div>
+        <ul class="fw-list">
+          <li>Users leave before habit forms</li>
+          <li>Leaky bucket despite good acquisition</li>
+          <li>Product-habit fit not established</li>
+          <li>Fix: trigger loops, habit hooks, CS</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="sec-label">// System Archetypes (Senge)</p>
+
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Archetype</th>
+          <th>Pattern</th>
+          <th>Startup Example</th>
+          <th>Fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-purple">Limits to Growth</span></td>
+          <td>Growth hits ceiling due to hidden constraint</td>
+          <td>Viral app slows when CAC rises post-saturation</td>
+          <td>Find next growth constraint proactively</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">Shifting the Burden</span></td>
+          <td>Short-term fix masks root problem</td>
+          <td>Discounting to hit revenue instead of fixing churn</td>
+          <td>Address root; use workaround only while fixing</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">Tragedy of Commons</span></td>
+          <td>Shared resource depleted by rational actors</td>
+          <td>Marketplace quality degrades as sellers race to bottom</td>
+          <td>Governance layer + incentive alignment</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">Escalation</span></td>
+          <td>Two sides in arms race</td>
+          <td>Price wars between competitors until both lose margin</td>
+          <td>Exit the race; compete on different axis</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PANEL: AI DIVISION -->
+  <div id="panel-aidivision" class="panel">
+    <p class="sec-label">// AI-Native Operator Framework</p>
+
+    <div class="card">
+      <div class="card-title">◈ The DT AI Division Matrix</div>
+      <div class="card-body">For every task, ask: who does this best — Human, AI, or Structured Data? The answer defines your leverage architecture.</div>
+    </div>
+
+    <div class="ai-table-wrap">
+      <table class="ai-table">
+        <thead>
+          <tr>
+            <th>Task Layer</th>
+            <th>⚡ AI Does</th>
+            <th>◎ Human Does</th>
+            <th>▦ Data/System Does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Research &amp; Synthesis</td>
+            <td>Summarize, pattern-find, cross-reference large corpus</td>
+            <td>Frame the right question; judge relevance</td>
+            <td>Store structured signals, run queries</td>
+          </tr>
+          <tr>
+            <td>Strategy Formulation</td>
+            <td>Generate option space, stress-test logic</td>
+            <td>Choose, commit, take responsibility for tradeoffs</td>
+            <td>Historical performance data informs priors</td>
+          </tr>
+          <tr>
+            <td>Product Design</td>
+            <td>Generate UI variants, write copy, suggest flows</td>
+            <td>Empathize with user; make taste decisions</td>
+            <td>A/B test results, usage analytics drive iteration</td>
+          </tr>
+          <tr>
+            <td>Customer Communication</td>
+            <td>Draft responses, detect sentiment, triage</td>
+            <td>Handle escalations, build relationship trust</td>
+            <td>CRM tracks history; autorouting rules handle volume</td>
+          </tr>
+          <tr>
+            <td>Ops &amp; Execution</td>
+            <td>Generate SOPs, flag anomalies, automate workflows</td>
+            <td>Handle exceptions; ensure culture in the loop</td>
+            <td>Zapier/n8n/pipelines run the repeatable</td>
+          </tr>
+          <tr>
+            <td>Learning &amp; Reflection</td>
+            <td>Identify blind spots in your thinking, challenge reasoning</td>
+            <td>Own the insight; decide what to internalize</td>
+            <td>Notion/Obsidian knowledge graph compounds over time</td>
+          </tr>
+          <tr>
+            <td>Fundraising / Pitch</td>
+            <td>Build narrative structure, sharpen language</td>
+            <td>Conviction, relationships, room-reading</td>
+            <td>Data room auto-populates from live metrics</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+    <p class="sec-label">// AI Tool Stack for DT Fellows</p>
+
+    <div class="fw-grid">
+      <div class="fw-card purple">
+        <div class="fw-num">THINKING</div>
+        <div class="fw-title">Claude / GPT-4o</div>
+        <ul class="fw-list">
+          <li>Deep reasoning tasks</li>
+          <li>Assignment frameworks</li>
+          <li>Stress-test arguments</li>
+          <li>Structured output generation</li>
+        </ul>
+      </div>
+      <div class="fw-card teal">
+        <div class="fw-num">RESEARCH</div>
+        <div class="fw-title">Perplexity / Gemini</div>
+        <ul class="fw-list">
+          <li>Live web research</li>
+          <li>Competitive analysis</li>
+          <li>Market sizing facts</li>
+          <li>Recent case studies</li>
+        </ul>
+      </div>
+      <div class="fw-card amber">
+        <div class="fw-num">BUILDING</div>
+        <div class="fw-title">Cursor / v0 / Replit</div>
+        <ul class="fw-list">
+          <li>Prototype MVPs fast</li>
+          <li>AI-native codebase</li>
+          <li>Ship before perfect</li>
+          <li>Iterate in hours not weeks</li>
+        </ul>
+      </div>
+      <div class="fw-card red">
+        <div class="fw-num">SYSTEMS</div>
+        <div class="fw-title">Notion / n8n / Airtable</div>
+        <ul class="fw-list">
+          <li>Structured data architecture</li>
+          <li>Workflow automation</li>
+          <li>Team knowledge base</li>
+          <li>OKR + experiment tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: TRACKER -->
+  <div id="panel-tracker" class="panel">
+    <p class="sec-label">// Experiment Tracker</p>
+
+    <div class="input-block">
+      <div class="input-label">LOG A NEW EXPERIMENT</div>
+      <div class="tracker-form">
+        <input type="text" id="expHyp" placeholder="Hypothesis: If I do X, then Y because Z..." />
+        <input type="text" id="expMetric" placeholder="Success metric (e.g. 30% open rate)" />
+        <input type="text" id="expAction" placeholder="Action / what you will test" />
+        <input type="text" id="expDeadline" placeholder="Deadline (e.g. 3 days)" />
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="addExperiment()">+ Log Experiment</button>
+      </div>
+    </div>
+
+    <div id="experimentList">
+      <div class="experiment-item">
+        <div class="exp-number">01</div>
+        <div class="exp-content">
+          <div class="exp-title">Cold email sequence A/B test on subject line personalization</div>
+          <div class="exp-desc">Hypothesis: Personalized subject lines with company-specific insight will increase open rates by 40% over generic lines because they signal research and relevance.</div>
+          <div class="exp-meta">
+            <span class="badge badge-teal">Metric: 40% open rate</span>
+            <span class="badge badge-purple">Deadline: 5 days</span>
+            <span class="badge badge-amber">Status: Running</span>
+          </div>
+        </div>
+      </div>
+      <div class="experiment-item">
+        <div class="exp-number">02</div>
+        <div class="exp-content">
+          <div class="exp-title">Landing page value prop — problem-first vs solution-first copy</div>
+          <div class="exp-desc">Hypothesis: Leading with the user's pain (not our feature) will reduce bounce by 25% because users identify faster and feel understood.</div>
+          <div class="exp-meta">
+            <span class="badge badge-teal">Metric: 25% lower bounce</span>
+            <span class="badge badge-purple">Deadline: 1 week</span>
+            <span class="badge badge-red">Status: Planned</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL: FRAMEWORK -->
+  <div id="panel-framework" class="panel">
+    <p class="sec-label">// The DT Structured Execution Framework</p>
+
+    <div class="fw-grid">
+      <div class="fw-card purple">
+        <div class="fw-num">LAYER 01</div>
+        <div class="fw-title">First Principles</div>
+        <ul class="fw-list">
+          <li>Break every assumption</li>
+          <li>Ask "why does this system exist?"</li>
+          <li>Find the root cause, not symptom</li>
+          <li>Reconstruct from fundamentals</li>
+        </ul>
+      </div>
+      <div class="fw-card teal">
+        <div class="fw-num">LAYER 02</div>
+        <div class="fw-title">Structured Execution</div>
+        <ul class="fw-list">
+          <li>Problem → Root Cause → Analysis</li>
+          <li>Constraints → Solutions → Tradeoffs</li>
+          <li>Recommended Path → Execution Plan</li>
+          <li>Metrics → Key Insights → Next Step</li>
+        </ul>
+      </div>
+      <div class="fw-card amber">
+        <div class="fw-num">LAYER 03</div>
+        <div class="fw-title">AI-Native Thinking</div>
+        <ul class="fw-list">
+          <li>Human vs AI vs Data tasks</li>
+          <li>Where does automation create leverage?</li>
+          <li>What compounds over time?</li>
+          <li>Build systems, not processes</li>
+        </ul>
+      </div>
+      <div class="fw-card red">
+        <div class="fw-num">LAYER 04</div>
+        <div class="fw-title">Systems Thinking</div>
+        <ul class="fw-list">
+          <li>Map feedback loops first</li>
+          <li>Find the actual bottleneck</li>
+          <li>Identify perverse incentives</li>
+          <li>Second-order consequences</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <p class="sec-label">// Execution Metrics Scorecard</p>
+
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Leading Indicator</th>
+          <th>Lagging Indicator</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Thinking Quality</td>
+          <td>Depth of problem decomposition</td>
+          <td>Feedback from peers / mentors</td>
+          <td><span class="badge badge-purple">Human</span></td>
+        </tr>
+        <tr>
+          <td>Execution Speed</td>
+          <td>Tasks shipped per week</td>
+          <td>Milestone completion rate</td>
+          <td><span class="badge badge-teal">Systems</span></td>
+        </tr>
+        <tr>
+          <td>Experiment Velocity</td>
+          <td>Hypotheses tested / month</td>
+          <td>Insight-to-action conversion</td>
+          <td><span class="badge badge-amber">AI + Human</span></td>
+        </tr>
+        <tr>
+          <td>Learning Compounding</td>
+          <td>Notes + reflections logged</td>
+          <td>Pattern recognition speed over time</td>
+          <td><span class="badge badge-red">Human</span></td>
+        </tr>
+        <tr>
+          <td>AI Leverage</td>
+          <td>% of repeatable tasks automated</td>
+          <td>Time saved → redirected to thinking</td>
+          <td><span class="badge badge-purple">AI + Systems</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+let expCount = 2;
+
+function addExperiment() {
+  const hyp = document.getElementById('expHyp').value.trim();
+  const metric = document.getElementById('expMetric').value.trim();
+  const action = document.getElementById('expAction').value.trim();
+  const deadline = document.getElementById('expDeadline').value.trim();
+
+  if (!hyp && !action) { return; }
+
+  expCount++;
+  const num = String(expCount).padStart(2, '0');
+  const item = document.createElement('div');
+  item.className = 'experiment-item';
+  item.style.animation = 'fadeIn 0.3s ease';
+  item.innerHTML = `
+    <div class="exp-number">${num}</div>
+    <div class="exp-content">
+      <div class="exp-title">${action || 'New experiment'}</div>
+      <div class="exp-desc">${hyp || 'No hypothesis logged yet.'}</div>
+      <div class="exp-meta">
+        ${metric ? `<span class="badge badge-teal">Metric: ${metric}</span>` : ''}
+        ${deadline ? `<span class="badge badge-purple">Deadline: ${deadline}</span>` : ''}
+        <span class="badge badge-amber">Status: Planned</span>
+      </div>
+    </div>`;
+
+  document.getElementById('experimentList').prepend(item);
+  ['expHyp','expMetric','expAction','expDeadline'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function clearAll() {
+  document.getElementById('assignmentInput').value = '';
+  document.getElementById('outputBody').style.display = 'block';
+  document.getElementById('outputBody').textContent = 'Paste your assignment above and hit Generate.\n\nThe engine will break it using:\n→ First Principles Thinking\n→ Systems Analysis with feedback loops\n→ AI-Human division of labor\n→ Startup-grade execution plan\n→ Measurable metrics + next experiments';
+  document.getElementById('fwOutput').style.display = 'none';
+  document.getElementById('insightRow').style.display = 'none';
+  document.getElementById('outputStatus').textContent = 'READY';
+}
+
+async function solveAssignment() {
+  const input = document.getElementById('assignmentInput').value.trim();
+  if (!input) {
+    document.getElementById('outputBody').textContent = '⚠ Please paste your assignment first.';
+    return;
+  }
+
+  const domain = document.getElementById('domainSelect').value;
+  const domainLabel = document.getElementById('domainSelect').selectedOptions[0].text;
+
+  document.getElementById('outputBody').style.display = 'flex';
+  document.getElementById('outputBody').className = 'output-body thinking';
+  document.getElementById('outputBody').innerHTML = '<div class="spinner"></div> Thinking like a systems architect...';
+  document.getElementById('fwOutput').style.display = 'none';
+  document.getElementById('insightRow').style.display = 'none';
+  document.getElementById('outputStatus').textContent = 'PROCESSING';
+
+  const systemPrompt = `You are a senior systems thinker, startup operator, AI-native strategist, and product architect for the DeepThought (DT) Fellowship. You think like a startup founder, first-principles reasoner, and AI-native builder.
+
+Generate answers using this exact JSON structure (respond ONLY with valid JSON, no markdown, no backticks):
+
+{
+  "problem": "1-2 sentence crisp problem statement",
+  "root_cause": "The actual underlying cause, not the symptom",
+  "system_analysis": "How the system is structured, feedback loops, dependencies (3-5 sentences)",
+  "constraints": "Real constraints: resources, time, market, human behavior (2-4 bullets as one string with newlines)",
+  "solutions": "3 distinct approaches with brief rationale (one string with newlines, use → for each)",
+  "tradeoffs": "What each solution trades off (speed vs quality, scale vs control, etc.)",
+  "recommended_path": "The best path and why, specific and opinionated",
+  "execution_plan": "5-7 concrete steps, ordered, with owners (AI / Human / System). Format as numbered list.",
+  "metrics": "3-5 specific, measurable metrics to track success (leading and lagging)",
+  "key_insight": "One sentence: the non-obvious insight most people miss",
+  "structural_observation": "One sentence: the structural pattern in this problem",
+  "what_most_miss": "One sentence: the blind spot in conventional thinking about this",
+  "ai_leverage": "One sentence: where AI creates 10x leverage in solving this",
+  "next_experiment": "One sentence: the single best experiment to run in the next 72 hours"
+}`;
+
+  const userMsg = `Domain: ${domainLabel}
+
+Assignment/Problem: ${input}
+
+Respond ONLY with valid JSON. No preamble. No markdown fences.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+
+    const data = await resp.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+
+    let parsed;
+    try { parsed = JSON.parse(clean); }
+    catch(e) {
+      document.getElementById('outputBody').className = 'output-body';
+      document.getElementById('outputBody').style.display = 'block';
+      document.getElementById('outputBody').textContent = '⚠ Parse error. Raw response:\n\n' + raw;
+      document.getElementById('outputStatus').textContent = 'ERROR';
+      return;
+    }
+
+    document.getElementById('outputBody').style.display = 'none';
+    const fw = document.getElementById('fwOutput');
+    fw.style.display = 'block';
+
+    const sections = [
+      { key: 'problem', label: 'Problem', cls: 'white' },
+      { key: 'root_cause', label: 'Root Cause', cls: 'red' },
+      { key: 'system_analysis', label: 'System Analysis', cls: 'purple' },
+      { key: 'constraints', label: 'Constraints', cls: 'amber' },
+      { key: 'solutions', label: 'Possible Solutions', cls: 'teal' },
+      { key: 'tradeoffs', label: 'Tradeoffs', cls: 'amber' },
+      { key: 'recommended_path', label: 'Recommended Path', cls: 'teal' },
+      { key: 'execution_plan', label: 'Execution Plan', cls: 'purple' },
+      { key: 'metrics', label: 'Metrics', cls: 'white' },
+    ];
+
+    fw.innerHTML = sections.map(s => `
+      <div class="fw-section">
+        <div class="fw-section-label ${s.cls}">${s.label}</div>
+        <div class="fw-section-text">${(parsed[s.key] || '—').replace(/\n/g,'<br>')}</div>
+      </div>`).join('');
+
+    document.getElementById('ins1').textContent = parsed.key_insight || '—';
+    document.getElementById('ins2').textContent = parsed.structural_observation || '—';
+    document.getElementById('ins3').textContent = parsed.what_most_miss || '—';
+    document.getElementById('ins4').textContent = parsed.ai_leverage || '—';
+    document.getElementById('ins5').textContent = parsed.next_experiment || '—';
+    document.getElementById('insightRow').style.display = 'grid';
+    document.getElementById('outputStatus').textContent = 'COMPLETE';
+
+  } catch(err) {
+    document.getElementById('outputBody').className = 'output-body';
+    document.getElementById('outputBody').style.display = 'block';
+    document.getElementById('outputBody').textContent = '⚠ API error: ' + err.message;
+    document.getElementById('outputStatus').textContent = 'ERROR';
+  }
+}
+</script>
+</body>
+</html>
